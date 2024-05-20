@@ -1,10 +1,11 @@
+import { Request, Response } from "express";
 import { ProductRelatedServices } from "./produuct.service";
 
 const createAproduct = async (req: Request, res: Response) => {
     try {
-      const { product: data } = req.body;
+      const { product} = req.body;
       // will call service func to send data
-      const result = await ProductRelatedServices.createProductIntoDB(data);
+      const result = await ProductRelatedServices.createProductIntoDB(product);
   
       //send as response
   

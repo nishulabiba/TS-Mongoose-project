@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ProductRelatedServices } from "./produuct.service";
+import { ProductRelatedServices } from "./product.service";
 
 const createAproduct = async (req: Request, res: Response) => {
     try {
@@ -11,8 +11,8 @@ const createAproduct = async (req: Request, res: Response) => {
   
       res.status(200).json({
         success: true,
+        message: "Product created successfully!",
         data: result,
-        message: 'student created successfully',
       });
     } catch (err) {
       console.log(err);
@@ -25,7 +25,11 @@ const createAproduct = async (req: Request, res: Response) => {
   
       //send as response
   
-      res.status(200).json(result);
+      res.status(200).json({
+        success: true,
+        message: "Products fetched successfully!",
+        data: result,
+      });
     } catch (err) {
       console.log(err);
     }

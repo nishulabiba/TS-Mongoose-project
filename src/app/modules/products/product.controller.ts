@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
 import { ProductRelatedServices } from './product.service';
 import productValidationSchema from './product.validation';
+import { ZodError } from 'zod';
 
 const createAproduct = async (req: Request, res: Response) => {
   try {
-    const { product } = req.body;
+    const { product
+     } = req.body;
 
     //data validation using zod
 
@@ -20,8 +22,23 @@ const createAproduct = async (req: Request, res: Response) => {
       message: 'Product created successfully!',
       data: result,
     });
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      // If Zod validation fails, send a 400 response with Zod error messages
+      const formattedErrors = error.errors.map((err) => err.message);
+      res.status(400).json({
+        success: false,
+        message: 'Validation failed:',
+        errors: formattedErrors,
+      });
+    } else {
+      // If other errors occur, send a 500 response
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error.',
+      });
+    }
   }
 };
 

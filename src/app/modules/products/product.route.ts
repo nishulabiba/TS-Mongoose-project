@@ -8,6 +8,6 @@ const router = express.Router()
 
 router.post("/", ProductController.createAproduct)
 router.get("/", ProductController.getProduct)
-
+router.get("/:productId", ProductController.getSpecificProduct)
 
 export const ProductRoute= router;

@@ -32,11 +32,11 @@ const createAproduct = async (req: Request, res: Response) => {
         errors: formattedErrors,
       });
     } else {
-      // If other errors occur, send a 500 response
+      
       console.error(error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error.',
+        message:  'Internal server error.',
       });
     }
   }
@@ -57,8 +57,26 @@ const getProduct = async (req: Request, res: Response) => {
     console.log(err);
   }
 };
+const getSpecificProduct = async (req: Request, res: Response) => {
+  try {
+    const {productId} = req.params;
+    const result = await ProductRelatedServices.findSpecificProduct(productId)
+    
+
+    //send as response
+
+    res.status(200).json({
+      success: true,
+      message: 'Products fetched successfully!',
+      data: result,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 export const ProductController = {
   createAproduct,
   getProduct,
+  getSpecificProduct
 };

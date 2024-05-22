@@ -7,5 +7,4 @@ const router = express.Router();
 
 router.post('/', ProductController.makeAnOrder);
 router.get('/', ProductController.getAllOrders);
-router.get('/', ProductController.getOrdersByUserEmailController);
 export const OrderRoute = router;

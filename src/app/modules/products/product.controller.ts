@@ -38,15 +38,16 @@ const createAproduct = async (req: Request, res: Response) => {
   }
 };
 
-const getProduct = async (req: Request, res: Response) => {
+const getProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const result = await ProductRelatedServices.getProductsFromDB();
-
-    //send as response
+    const searchTerm = req.query.searchTerm?.toString();
+    const result = await ProductRelatedServices.getProductsFromDB(searchTerm);
 
     res.status(200).json({
       success: true,
-      message: 'Products fetched successfully!',
+      message: searchTerm
+        ? `Products matching search term '${searchTerm}' fetched successfully!`
+        : 'Products fetched successfully!',
       data: result,
     });
   } catch (error) {
@@ -163,25 +164,7 @@ const deleteProduct = async (req: Request, res: Response) => {
     });
   }
 };
-const searchProducts = async (req: Request, res: Response) => {
-  try {
-    const searchTerm: string = req.query.searchTerm as string;
 
-    // Search products based on the searchTerm
-    const result = await ProductRelatedServices.findProductBySearchTerm(searchTerm)
-    res.status(200).json({
-      success: true,
-      message: `Products matching search term '${searchTerm}' fetched successfully!`,
-      data: result,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error.',
-    });
-  }
-};
 
 
 //Order controllers
@@ -205,7 +188,7 @@ const makeAnOrder = async (req: Request, res: Response) => {
     product.inventory.quantity -= order.quantity;
     product.inventory.inStock = product.inventory.quantity > 0;
 
-    await ProductRelatedServices.updateSpecificProduct(product._id, { inventory: product.inventory });
+    await ProductRelatedServices.updateSpecificProduct(product._id ?? '', { inventory: product.inventory });
 
     const result = await ProductRelatedServices.makeAnOrderIntoDB(zodParsedData);
 
@@ -232,11 +215,12 @@ const makeAnOrder = async (req: Request, res: Response) => {
   }
 };
 
-const getAllOrders = async (req: Request, res: Response) => {
+const getAllOrders = async (req: Request, res: Response): Promise<void> => {
   try {
-    const result = await ProductRelatedServices.getOrdersFromDB();
-
-    //send as response
+    const email = req.query.email?.toString();
+    const result = email
+      ? await ProductRelatedServices.getOrdersFromDB(email)
+      : await ProductRelatedServices.getOrdersFromDB();
 
     res.status(200).json({
       success: true,
@@ -244,38 +228,10 @@ const getAllOrders = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      const formattedErrors = error.errors.map((err) => err.message);
-      res.status(400).json({
-        success: false,
-        message: 'Validation failed:',
-        errors: formattedErrors,
-      });
-    } else {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error.',
-      });
-    }
-  }
-};
-const getOrdersByUserEmailController = async (req: Request, res: Response) => {
-  try {
-    const email: string = req.query.email as string;
-
-    const orders = await ProductRelatedServices.getOrdersByUserEmail(email);
-
-    res.status(200).json({
-      success: true,
-      message: 'Orders fetched successfully for user email!',
-      data: orders,
-    });
-  } catch (error) {
-    console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error.',
+      message: 'Failed to fetch orders',
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -288,8 +244,6 @@ export const ProductController = {
   getSpecificProduct,
   updateProduct,
   deleteProduct,
-  searchProducts,
   makeAnOrder,
   getAllOrders,
-  getOrdersByUserEmailController
 };

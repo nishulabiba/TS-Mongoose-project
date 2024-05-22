@@ -4,8 +4,12 @@ import { ProductModel } from './product.model';
 
 const createProductIntoDB = async (product: Product): Promise<Product> => {
   try {
-    
+    // if (await ProductModel.isProductExists(product.name)) {
+    //   throw new Error('Product already exists!');
+    // }
+    // console.log(await ProductModel.isProductExists);
     const result = await ProductModel.create(product);
+
     return result;
   } catch (error) {
     if (error instanceof Error) {
@@ -16,15 +20,21 @@ const createProductIntoDB = async (product: Product): Promise<Product> => {
   }
 };
 
-const getProductsFromDB = async (): Promise<Product[]> => {
+const getProductsFromDB = async (searchTerm?: string): Promise<Product[]> => {
   try {
-    const result = await ProductModel.find();
-    return result;
+    if (searchTerm) {
+      const regex = new RegExp(searchTerm, 'i');
+      return await ProductModel.find({
+        $or: [{ name: regex }, { description: regex }],
+      });
+    } else {
+      return await ProductModel.find();
+    }
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Error retrieving products: ${error.message}`);
+      throw new Error(`Error retrieving Orders: ${error.message}`);
     } else {
-      throw new Error('Unknown error occurred while retrieving products');
+      throw new Error('Unknown error occurred while retrieving orders');
     }
   }
 };
@@ -41,9 +51,14 @@ const findSpecificProduct = async (id: string): Promise<Product | null> => {
     }
   }
 };
-const updateSpecificProduct = async (id: string, updateData: { inventory: Inventory }) => {
+const updateSpecificProduct = async (
+  id: string | null,
+  updateData: { inventory: Inventory },
+) => {
   try {
-    const result = await ProductModel.findByIdAndUpdate(id, { $set: { inventory: updateData.inventory } });
+    const result = await ProductModel.findByIdAndUpdate(id, {
+      $set: { inventory: updateData.inventory },
+    });
     return result;
   } catch (error) {
     if (error instanceof Error) {
@@ -53,36 +68,16 @@ const updateSpecificProduct = async (id: string, updateData: { inventory: Invent
     }
   }
 };
-const deleteSpecificProduct = async (id: string)=> {
+const deleteSpecificProduct = async (id: string) => {
   try {
-    const result = await ProductModel.deleteOne({ _id: id })
-      
+    const result = await ProductModel.deleteOne({ _id: id });
+
     return result;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Error deleting product: ${error.message}`);
     } else {
       throw new Error('Unknown error occurred while deleting product');
-    }
-  }
-};
-
-const findProductBySearchTerm = async (searchTerm : string) => {
-  try {
-    const products = await ProductModel.find({
-      $and: [
-        { name: { $regex: searchTerm, $options: 'i' } },      
-        { description: { $regex: searchTerm, $options: 'i' } },
-        { category: { $regex: searchTerm, $options: 'i' } },     
-        { tags: { $in: [searchTerm] } },                         
-      ],
-    });
-    return products;
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Error finding product: ${error.message}`);
-    } else {
-      throw new Error('Unknown error occurred while finding product');
     }
   }
 };
@@ -100,12 +95,11 @@ const makeAnOrderIntoDB = async (order: Order): Promise<Order> => {
       throw new Error('Unknown error occurred while creating order');
     }
   }
-
 };
-const getOrdersFromDB = async (email: string): Promise<Order[]> => {
+const getOrdersFromDB = async (email?: string): Promise<Order[]> => {
   try {
-    const result = await OrderModel.find({email});
-
+    const query = email ? { email } : {};
+    const result = await OrderModel.find(query);
     return result;
   } catch (error) {
     if (error instanceof Error) {
@@ -115,16 +109,6 @@ const getOrdersFromDB = async (email: string): Promise<Order[]> => {
     }
   }
 };
-const getOrdersByUserEmail = async (email: string) => {
-  try {
-    const orders = await OrderModel.find({ email : email });
-    return orders;
-  } catch (error) {
-    throw new Error('Error fetching orders by user email');
-  }
-};
-
-
 
 export const ProductRelatedServices = {
   createProductIntoDB,
@@ -132,8 +116,7 @@ export const ProductRelatedServices = {
   findSpecificProduct,
   updateSpecificProduct,
   deleteSpecificProduct,
-  findProductBySearchTerm,
+
   makeAnOrderIntoDB,
   getOrdersFromDB,
-  getOrdersByUserEmail
 };

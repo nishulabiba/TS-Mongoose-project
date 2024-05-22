@@ -11,6 +11,7 @@ const inventoryValidationSchema = z.object({
 });
 
 const productValidationSchema = z.object({
+  // _id: z.string().trim().max(255, 'Product name must be within 100 characters.').optional(),
   name: z
     .string()
     .trim()

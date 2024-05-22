@@ -30,6 +30,7 @@ const inventorySchema = new Schema<Inventory>({
 });
 
 const productSchema = new Schema<Product, ProductStaticModel>({
+
   name: {
     type: String,
     required: [true, 'Product name is required'],
@@ -71,7 +72,7 @@ const productSchema = new Schema<Product, ProductStaticModel>({
 
 export const ProductModel = model<Product, ProductStaticModel>('Product', productSchema);
 
-productSchema.statics.isProductExists = async function (name: string) {
-  const existingProduct = await ProductModel.findOne({ name });
-  return existingProduct !== null;
-};
+//productSchema.statics.isProductExists = async function(name: string) {
+//   const existingProduct = await ProductModel.findOne({ name });
+//   return existingProduct ;
+// };

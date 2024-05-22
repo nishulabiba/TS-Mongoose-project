@@ -31,5 +31,11 @@ const productValidationSchema = z.object({
     .min(1, 'At least one variant is required.'),
   inventory: inventoryValidationSchema,
 });
+export const OrderValidationSchema = z.object({
+  email: z.string().email().min(1, { message: 'Email is required' }).max(255, { message: 'Email must be at most 255 characters' }),
+  productId: z.string().min(1, { message: 'Product ID is required' }).max(255, { message: 'Product ID must be at most 255 characters' }),
+  price: z.number().positive({ message: 'Price must be a positive number' }),
+  quantity: z.number().int().positive({ message: 'Quantity must be a positive integer' }),
+});
 
 export default productValidationSchema;

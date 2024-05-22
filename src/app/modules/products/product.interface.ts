@@ -1,6 +1,3 @@
-
-import { Model } from 'mongoose';
-
 export type Variant = {
   type: string;
   value: string;
@@ -11,7 +8,7 @@ export type Inventory = {
   inStock: boolean;
 };
 
-export type Product ={
+export type Product = {
   _id?: string;
   name: string;
   description: string;
@@ -20,18 +17,16 @@ export type Product ={
   tags: string[];
   variants: Variant[];
   inventory: Inventory;
-}
-
+};
 
 export type Order = {
   email: string;
   productId: string;
   price: number;
   quantity: number;
-}
+};
 
-export interface ProductStaticModel extends Model<Product> {
-  // eslint-disable-next-line no-unused-vars
-  isProductExists(name: string): Promise<boolean>;
-}
-
+// export interface ProductStaticModel extends Model<Product> {
+//   // eslint-disable-next-line no-unused-vars
+//   isProductExists(name: string): Promise<boolean>;
+// }

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { ProductRelatedServices } from './product.service';
-import productValidationSchema, { OrderValidationSchema } from './product.validation';
+import productValidationSchema, {
+  OrderValidationSchema,
+} from './product.validation';
 import { ZodError } from 'zod';
 
 const createAproduct = async (req: Request, res: Response) => {
@@ -165,8 +167,6 @@ const deleteProduct = async (req: Request, res: Response) => {
   }
 };
 
-
-
 //Order controllers
 
 const makeAnOrder = async (req: Request, res: Response) => {
@@ -175,22 +175,31 @@ const makeAnOrder = async (req: Request, res: Response) => {
 
     const zodParsedData = OrderValidationSchema.parse(order);
 
-    const product = await ProductRelatedServices.findSpecificProduct(order.productId);
+    const product = await ProductRelatedServices.findSpecificProduct(
+      order.productId,
+    );
 
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Product not found' });
     }
 
     if (product.inventory.quantity < order.quantity) {
-      return res.status(400).json({ success: false, message: 'Insufficient quantity available' });
+      return res
+        .status(400)
+        .json({ success: false, message: 'Insufficient quantity available' });
     }
 
     product.inventory.quantity -= order.quantity;
     product.inventory.inStock = product.inventory.quantity > 0;
 
-    await ProductRelatedServices.updateSpecificProduct(product._id ?? '', { inventory: product.inventory });
+    await ProductRelatedServices.updateSpecificProduct(product._id ?? '', {
+      inventory: product.inventory,
+    });
 
-    const result = await ProductRelatedServices.makeAnOrderIntoDB(zodParsedData);
+    const result =
+      await ProductRelatedServices.makeAnOrderIntoDB(zodParsedData);
 
     res.status(200).json({
       success: true,
@@ -235,8 +244,6 @@ const getAllOrders = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
-
-
 
 export const ProductController = {
   createAproduct,

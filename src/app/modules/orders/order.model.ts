@@ -23,7 +23,3 @@ const orderSchema = new Schema({
 });
 
 export const OrderModel = model<Order>('Order', orderSchema);
-
-
-
-

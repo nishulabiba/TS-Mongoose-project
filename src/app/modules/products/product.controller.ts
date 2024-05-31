@@ -7,7 +7,7 @@ import { ZodError } from 'zod';
 
 const createAproduct = async (req: Request, res: Response) => {
   try {
-    const { product } = req.body;
+    const product = req.body;
 
     const zodParsedData = productValidationSchema.parse(product);
 
@@ -171,8 +171,7 @@ const deleteProduct = async (req: Request, res: Response) => {
 
 const makeAnOrder = async (req: Request, res: Response) => {
   try {
-    const { order } = req.body;
-
+    const order = req.body;
     const zodParsedData = OrderValidationSchema.parse(order);
 
     const product = await ProductRelatedServices.findSpecificProduct(
